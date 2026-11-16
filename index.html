@@ -12,6 +12,7 @@
   ║   3. Your video → VIDEO SRC GOES HERE        (CONFIG.video)  ║
   ║   4. Your messages / sweet note / final note (CONFIG)        ║
   ║   5. Formspree ID → UPI ID arrives by email  (CONFIG)        ║
+  ║   6. Songs: letter song (music) + main song (bgMusic)        ║
   ║                                                              ║
   ║  FOLDER SETUP: put this HTML file, the 6 photos and the      ║
   ║  video in ONE folder, then zip the whole folder to share it. ║
@@ -146,6 +147,7 @@
           transform 0.8s,
           visibility 0.8s;
         overflow-y: auto;
+        overflow-x: hidden; /* 📱 stops decorations from creating sideways scroll / off-centre layout on phones */
       }
       /* these two lines center the content AND let it scroll on small phones */
       .scene > :first-child {
@@ -400,6 +402,106 @@
         font-size: 0.9rem;
       }
 
+      /* ✨ CARD FLIP EFFECTS: pop + glow + shine sweep + sparkle burst */
+      .card {
+        position: relative;
+      }
+      .card.pop {
+        z-index: 5;
+        animation: cardpop 0.8s cubic-bezier(0.34, 1.4, 0.64, 1);
+      }
+      @keyframes cardpop {
+        0% {
+          transform: scale(1);
+        }
+        35% {
+          transform: scale(1.16) rotate(-2.5deg);
+        }
+        70% {
+          transform: scale(0.97) rotate(1deg);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .card .b::after {
+        /* diagonal light streak that sweeps across the photo */
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          115deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.65) 50%,
+          transparent 70%
+        );
+        transform: translateX(-130%);
+        pointer-events: none;
+      }
+      .card.pop .b::after {
+        animation: shine 0.9s ease-out 0.3s;
+      }
+      @keyframes shine {
+        to {
+          transform: translateX(130%);
+        }
+      }
+      .card.flip .b {
+        animation: cglow 1.4s ease-out;
+      }
+      @keyframes cglow {
+        30% {
+          box-shadow:
+            0 0 46px 12px rgba(255, 217, 138, 0.8),
+            0 0 22px rgba(255, 158, 196, 0.6);
+        }
+      }
+      /* particles are added to <body> by JavaScript at the card's position */
+      .fxp {
+        position: fixed;
+        z-index: 40;
+        pointer-events: none;
+        font-size: 1.1rem;
+        margin: -0.55em 0 0 -0.55em;
+        opacity: 0;
+        animation: pburst 1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+      }
+      @keyframes pburst {
+        0% {
+          transform: translate(0, 0) scale(0.2) rotate(0);
+          opacity: 0;
+        }
+        15% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--x), var(--y)) scale(1.2) rotate(var(--r));
+          opacity: 0;
+        }
+      }
+      .fxring {
+        position: fixed;
+        z-index: 39;
+        pointer-events: none;
+        width: 40px;
+        height: 40px;
+        margin: -20px 0 0 -20px;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        box-shadow: 0 0 18px var(--gold);
+        animation: ringout 0.8s ease-out forwards;
+      }
+      @keyframes ringout {
+        from {
+          transform: scale(0.3);
+          opacity: 1;
+        }
+        to {
+          transform: scale(4.2);
+          opacity: 0;
+        }
+      }
+
       /* ---------- SCENE 3: video ("tap the star" → glowing screen) ---------- */
       /* ✨ SMOOTHNESS NOTE: only "transform" and "opacity" are animated (the GPU handles those → buttery smooth).
    The star and the video screen sit on top of each other in the same spot (.stage) and cross-fade, so nothing "jumps". */
@@ -408,6 +510,7 @@
       }
       .stage {
         display: grid;
+        grid-template-columns: minmax(0, 1fr);
         place-items: center;
         margin-top: 18px;
         width: 100%;
@@ -525,6 +628,10 @@
    Only transform + opacity are animated, so it stays smooth even on phones. */
       .lstage {
         display: grid;
+        grid-template-columns: minmax(
+          0,
+          1fr
+        ); /* 📱 FIX: column can never grow wider than the screen, so the paper stays centred */
         place-items: center;
         margin-top: 14px;
         width: 100%;
@@ -781,6 +888,7 @@
    (Only transform + opacity are animated, so it stays smooth.) */
       .gstage {
         display: grid;
+        grid-template-columns: minmax(0, 1fr);
         place-items: center;
         width: 100%;
         margin-top: 12px;
@@ -1236,7 +1344,7 @@
       .lstage::before {
         content: "";
         grid-area: 1/1;
-        width: min(560px, 120vw);
+        width: min(560px, 100vw);
         height: min(560px, 90vh);
         border-radius: 50%;
         background: radial-gradient(
@@ -1565,6 +1673,8 @@
          (search for "AUDIO SRC GOES HERE" in the script below). It starts when she taps the
          envelope, fades in gently, and loops. -->
     <audio id="bgm" loop preload="auto"></audio>
+    <!-- 🎵 NEW: the song that plays through the whole page EXCEPT the letter (file name is set in CONFIG.bgMusic) -->
+    <audio id="bgm2" loop preload="auto"></audio>
     <button class="musicbtn" id="musicBtn" aria-label="music on/off">🔊</button>
 
     <script>
@@ -1630,7 +1740,21 @@
         //   • It starts when she taps the envelope (browsers only allow sound after a tap) and loops.
         music: "risk.mp3", // 🔧 EDIT: your audio file name
         musicVolume: 0.5, // 🔧 EDIT: 0 (silent) to 1 (full). 0.4–0.6 is nice background level
-        musicOnlyInLetter: true, // 🔧 EDIT: true = song fades out when she leaves the letter page, false = keeps playing softly until the end
+
+        /* ── 3d. MAIN BACKGROUND SONG (whole page, EXCEPT the letter) ── */
+        // 🎵 MAIN SONG GOES HERE:
+        //   • Put your mp3 in the SAME folder and write its file name below (case-sensitive).
+        //   • It starts on her very first tap ("Look up"), loops, and is paused while the letter page is open
+        //     (the letter's own song above plays there instead). It fades back in when she leaves the letter.
+        //   • It is also paused while the video is playing, so it never talks over your video.
+        //   • If the file is missing/empty, a soft built-in lullaby plays instead, so it's never silent.
+        bgMusic: "bg.mp3", // 🔧 EDIT: your main song's file name (or "" to use the built-in lullaby)
+        bgVolume: 0.35, // 🔧 EDIT: 0–1. Keep it a bit lower than the letter song
+
+        /* ── 3e. TAP SOUND EFFECTS ── */
+        // Little chimes, pops and sparkles when she taps things. They are made by code (no files needed).
+        sfx: true, // 🔧 EDIT: false = no sound effects at all
+        sfxVolume: 0.5, // 🔧 EDIT: 0–1
 
         /* ── 4. MESSAGES ──────────────────────────────────────────── */
         // Sweet message shown right before "Do you like me?"   (\n = new line)
@@ -1670,6 +1794,106 @@
    ═══════════════════════════════════════════════════════════════ */
 
       const $ = (s) => document.querySelector(s);
+
+      /* ---------- 🔔 TAP SOUND EFFECTS (generated by code, no audio files) ---------- */
+      const SFX = (() => {
+        let ctx = null,
+          out = null,
+          off = !CONFIG.sfx;
+        const pent = [0, 2, 4, 7, 9]; // pentatonic scale = every note sounds nice together
+        function init() {
+          if (off) return null;
+          if (!ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            ctx = new AC();
+            out = ctx.createGain();
+            out.gain.value = CONFIG.sfxVolume;
+            out.connect(ctx.destination);
+          }
+          if (ctx.state === "suspended") ctx.resume();
+          return ctx;
+        }
+        // one soft note: frequency f, starts `at` seconds from now, lasts `dur`, optional pitch slide
+        function tone(f, at, dur, type, vol, to) {
+          const c = init();
+          if (!c) return;
+          const t = c.currentTime + at,
+            o = c.createOscillator(),
+            g = c.createGain();
+          o.type = type || "sine";
+          o.frequency.setValueAtTime(f, t);
+          if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(vol || 0.3, t + 0.012);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          o.connect(g);
+          g.connect(out);
+          o.start(t);
+          o.stop(t + dur + 0.05);
+        }
+        const hz = (semi) => 523.25 * Math.pow(2, semi / 12);
+        function sparkle(at, base) {
+          // tiny twinkle: three quick high notes
+          [0, 4, 9].forEach((s, k) =>
+            tone(hz(base + s + 12), at + k * 0.06, 0.3, "sine", 0.12),
+          );
+        }
+        return {
+          mute(m) {
+            off = m || !CONFIG.sfx;
+          },
+          tap() {
+            tone(660, 0, 0.09, "sine", 0.25, 990);
+          }, // soft "pop" for ordinary buttons
+          chime(i) {
+            // star n of the heart: climbs up the scale as she connects them
+            const s = pent[i % 5] + 12 * Math.floor(i / 5);
+            tone(hz(s), 0, 0.55, "sine", 0.3);
+            tone(hz(s) * 2, 0, 0.35, "sine", 0.08);
+          },
+          wrong() {
+            tone(240, 0, 0.18, "triangle", 0.25, 150);
+          }, // gentle "nope"
+          flip() {
+            tone(420, 0, 0.22, "triangle", 0.18, 1300); // little whoosh
+            sparkle(0.12, pent[Math.floor(Math.random() * 5)]);
+          },
+          open() {
+            [0, 4, 7, 12].forEach((s, k) =>
+              tone(hz(s), k * 0.07, 0.5, "sine", 0.22),
+            );
+          }, // rising 4-note shimmer: envelope, star, gift box
+          win() {
+            [0, 4, 7, 12, 16].forEach((s, k) =>
+              tone(hz(s), k * 0.08, 0.6, "triangle", 0.22),
+            );
+            sparkle(0.45, 7);
+          }, // happy fanfare: heart done, "Yes", gift burst
+          boing() {
+            tone(300, 0, 0.22, "sine", 0.3, 700);
+            tone(700, 0.1, 0.2, "sine", 0.2, 260);
+          }, // the doggy "No" dodging
+          whoosh() {
+            tone(300, 0, 1.1, "sine", 0.18, 1400);
+            sparkle(0.5, 0);
+          }, // lantern floating up
+          ding() {
+            tone(hz(12), 0, 1.2, "sine", 0.3);
+            tone(hz(19), 0.12, 1.2, "sine", 0.2);
+          }, // "on its way" bell
+        };
+      })();
+      // ordinary buttons (Next, Send, Replay…) get the soft pop. Special things (stars, cards, envelope, gift, Yes/No) have their own sounds below.
+      document.addEventListener(
+        "click",
+        (e) => {
+          const b = e.target.closest("button");
+          if (b && !["no", "yes", "starbtn", "release"].includes(b.id))
+            SFX.tap();
+        },
+        true,
+      );
 
       // Put her name / your name / messages into the page
       document
@@ -1762,10 +1986,12 @@
       function pick(i) {
         if (step >= pts.length) return;
         if (i !== step) {
+          SFX.wrong();
           stars[i].classList.add("shake");
           setTimeout(() => stars[i].classList.remove("shake"), 300);
           return;
         } // wrong star = shake
+        SFX.chime(i); // 🔔 each star rings a higher note
         stars[i].classList.remove("next");
         stars[i].classList.add("done");
         if (i > 0) line(pts[i - 1], pts[i]);
@@ -1774,6 +2000,7 @@
         else {
           // all 10 done → close the heart + show the name + next button
           setTimeout(() => line(pts[pts.length - 1], pts[0]), 200);
+          setTimeout(() => SFX.win(), 450); // 🔔 heart complete
           setTimeout(() => {
             $("#conHint").textContent = "It's a heart. Of course it is. 😌";
             $("#conName").textContent = CONFIG.conName + " " + CONFIG.herName;
@@ -1788,6 +2015,34 @@
       /* ---------- Scene 2: photo cards ---------- */
       const icons = ["🌸", "🦋", "🌷", "🍓", "🌼", "💖"]; // placeholders used when a photo can't be found
       let flipped = 0;
+      // ✨ sparkles fly out from the centre of the tapped card, plus an expanding golden ring
+      function cardBurst(card) {
+        const r = card.getBoundingClientRect(),
+          cx = r.left + r.width / 2,
+          cy = r.top + r.height / 2,
+          bits = ["✨", "⭐", "💖", "🌸", "💫", "💛"]; // 🔧 swap emojis if you like
+        const ring = document.createElement("div");
+        ring.className = "fxring";
+        ring.style.left = cx + "px";
+        ring.style.top = cy + "px";
+        document.body.appendChild(ring);
+        setTimeout(() => ring.remove(), 900);
+        for (let k = 0; k < 12; k++) {
+          const a = (k / 12) * Math.PI * 2 + Math.random() * 0.4,
+            dist = 70 + Math.random() * 70,
+            p = document.createElement("span");
+          p.className = "fxp";
+          p.textContent = bits[k % bits.length];
+          p.style.left = cx + "px";
+          p.style.top = cy + "px";
+          p.style.setProperty("--x", Math.cos(a) * dist + "px");
+          p.style.setProperty("--y", Math.sin(a) * dist + "px");
+          p.style.setProperty("--r", (Math.random() - 0.5) * 240 + "deg");
+          p.style.animationDelay = Math.random() * 0.12 + "s";
+          document.body.appendChild(p);
+          setTimeout(() => p.remove(), 1300);
+        }
+      }
       CONFIG.cards.forEach((c, i) => {
         const d = document.createElement("div");
         d.className = "card";
@@ -1803,7 +2058,11 @@
         }; // photo not found → emoji
         d.onclick = () => {
           if (d.classList.contains("flip")) return;
-          d.classList.add("flip");
+          d.classList.add("flip", "pop");
+          setTimeout(() => d.classList.remove("pop"), 1300);
+          cardBurst(d); // ✨ sparkle burst + ring at the card
+          SFX.flip(); // 🔔 whoosh + twinkle
+          if (navigator.vibrate) navigator.vibrate(25); // tiny buzz on phones that support it
           flipped++;
           $("#cnt").textContent =
             flipped < CONFIG.cards.length
@@ -1837,6 +2096,7 @@
       $("#starbtn").onclick = () => {
         if (vShown) return;
         vShown = true;
+        SFX.open();
         $("#starbtn").classList.add("gone"); // star grows a little + fades out
         $("#vsub").style.opacity = 0; // the hint text fades out
         $("#screen").classList.add("show"); // the screen zooms in at the same time (cross-fade = smooth)
@@ -1866,6 +2126,7 @@
       $("#env").onclick = () => {
         if (letterOpened) return;
         letterOpened = true;
+        SFX.open();
         if (window.musicPlay) window.musicPlay(); // 🎵 NEW: music starts right on her tap (browsers only allow this straight after a tap)
         $("#envHint").classList.add("off"); // hint fades out
         $("#env").classList.add("open"); // 1) flap opens, letter peeks out
@@ -1925,55 +2186,193 @@
         $(".lstage").classList.add("fx");
       };
 
-      // 🎵 Background music: fades in on the envelope tap, loops, has a small mute button
-      const bgm = $("#bgm"),
+      /* 🎵 MUSIC MANAGER
+         Two tracks:
+           • bgm2  = MAIN song  → plays everywhere EXCEPT the letter page (and pauses while the video plays)
+           • bgm   = LETTER song → plays only on the letter page, after she taps the envelope
+         One mute button controls both. */
+      const bgm = $("#bgm"), // letter song
+        bg2 = $("#bgm2"), // main song
         mbtn = $("#musicBtn");
-      let musicStarted = false,
-        fadeT = null;
-      if (CONFIG.music) bgm.src = CONFIG.music; // 🎵 the audio file name from CONFIG.music is used here
-      function fadeTo(target, ms, done) {
-        clearInterval(fadeT);
-        const from = bgm.volume,
+      let muted = false,
+        mainStarted = false, // she has tapped once, so sound is allowed
+        letterSong = false, // she tapped the envelope
+        videoPlaying = false,
+        bgFailed = false,
+        synth = null;
+      if (CONFIG.music) bgm.src = CONFIG.music;
+      if (CONFIG.bgMusic) bg2.src = CONFIG.bgMusic;
+      else bgFailed = true;
+
+      // generic volume fader for an <audio> element
+      function fade(a, target, ms, done) {
+        clearInterval(a._t);
+        const from = a.volume,
           t0 = Date.now();
-        fadeT = setInterval(() => {
+        a._t = setInterval(() => {
           const k = Math.min(1, (Date.now() - t0) / ms);
-          bgm.volume = Math.max(0, Math.min(1, from + (target - from) * k));
+          a.volume = Math.max(0, Math.min(1, from + (target - from) * k));
           if (k >= 1) {
-            clearInterval(fadeT);
+            clearInterval(a._t);
             if (done) done();
           }
         }, 60);
       }
-      window.musicPlay = () => {
-        if (!CONFIG.music || musicStarted) return;
-        musicStarted = true;
-        bgm.volume = 0;
-        bgm
-          .play()
-          .then(() => {
-            mbtn.classList.add("on");
-            fadeTo(CONFIG.musicVolume, 3000); // gentle 3-second fade-in
-          })
-          .catch(() => {});
-      };
-      bgm.onerror = () => mbtn.classList.remove("on"); // audio file missing → stay silent, hide the button
-      mbtn.onclick = () => {
-        // mute / unmute
-        if (bgm.paused) {
-          bgm.play().catch(() => {});
-          fadeTo(CONFIG.musicVolume, 600);
-          mbtn.textContent = "🔊";
-        } else {
-          fadeTo(0, 400, () => bgm.pause());
-          mbtn.textContent = "🔇";
+
+      // 🎹 Built-in soft lullaby (used only if the main song file is missing). Pure code, no file needed.
+      function makeSynth() {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        const ctx = new AC(),
+          master = ctx.createGain(),
+          echo = ctx.createDelay(1),
+          fb = ctx.createGain(),
+          wet = ctx.createGain();
+        master.gain.value = 0;
+        echo.delayTime.value = 0.42;
+        fb.gain.value = 0.38;
+        wet.gain.value = 0.5;
+        master.connect(ctx.destination);
+        master.connect(echo);
+        echo.connect(fb);
+        fb.connect(echo);
+        echo.connect(wet);
+        wet.connect(ctx.destination);
+        const chords = [
+          [220, 261.63, 329.63, 392], // Am7
+          [174.61, 220, 261.63, 329.63], // Fmaj7
+          [196, 246.94, 293.66, 392], // G
+          [130.81, 164.81, 196, 261.63], // C
+        ];
+        let n = 0,
+          timer = null;
+        function note(f, t) {
+          const o = ctx.createOscillator(),
+            g = ctx.createGain();
+          o.type = "sine";
+          o.frequency.value = f * 2;
+          g.gain.setValueAtTime(0, t);
+          g.gain.linearRampToValueAtTime(0.16, t + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.0008, t + 1.6);
+          o.connect(g);
+          g.connect(master);
+          o.start(t);
+          o.stop(t + 1.7);
         }
+        function tick() {
+          const ch = chords[Math.floor(n / 8) % chords.length],
+            seq = [0, 1, 2, 3, 2, 1, 2, 3]; // gentle up-and-down arpeggio
+          note(ch[seq[n % 8]], ctx.currentTime + 0.05);
+          if (n % 8 === 0) note(ch[0] / 2, ctx.currentTime + 0.05); // soft bass note on each new chord
+          n++;
+        }
+        return {
+          start() {
+            if (ctx.state === "suspended") ctx.resume();
+            if (!timer) timer = setInterval(tick, 520);
+          },
+          level(v, ms) {
+            if (ctx.state === "suspended") ctx.resume();
+            master.gain.cancelScheduledValues(ctx.currentTime);
+            master.gain.setTargetAtTime(v, ctx.currentTime, ms / 3000);
+          },
+        };
+      }
+
+      // decides what the MAIN song should be doing right now
+      function mainApply() {
+        const want =
+          mainStarted && !muted && cur !== letterIdx && !videoPlaying;
+        if (synth) {
+          synth.level(want ? CONFIG.bgVolume : 0, want ? 2500 : 1200);
+          return;
+        }
+        if (bgFailed) return;
+        if (want) {
+          if (bg2.paused) {
+            bg2.volume = 0;
+            bg2.play().catch(useSynth); // can't play the file → lullaby instead
+          }
+          fade(bg2, CONFIG.bgVolume, 2500);
+        } else if (!bg2.paused) {
+          fade(bg2, 0, 1200, () => bg2.pause());
+        }
+      }
+      function useSynth() {
+        if (synth || !mainStarted) {
+          bgFailed = true;
+          return;
+        }
+        bgFailed = true;
+        synth = makeSynth();
+        if (synth) {
+          synth.start();
+          mainApply();
+        }
+      }
+      bg2.addEventListener("error", () => {
+        bgFailed = true;
+        if (mainStarted) useSynth();
+      });
+
+      // decides what the LETTER song should be doing right now
+      function letterApply() {
+        if (!CONFIG.music) return;
+        const want = letterSong && !muted && cur === letterIdx;
+        if (want) {
+          if (bgm.paused) {
+            bgm.volume = 0;
+            bgm.play().catch(() => {});
+          }
+          fade(bgm, CONFIG.musicVolume, 3000); // gentle 3-second fade-in
+        } else if (!bgm.paused) {
+          fade(bgm, 0, 1500, () => bgm.pause());
+        }
+      }
+      window.musicPlay = () => {
+        // called when she taps the envelope
+        letterSong = true;
+        letterApply();
       };
+
+      // first tap anywhere = browsers now allow sound → start the main song
+      document.addEventListener(
+        "click",
+        () => {
+          mainStarted = true;
+          mbtn.classList.add("on");
+          if (bgFailed) useSynth();
+          else mainApply();
+        },
+        { once: true },
+      );
+
+      // pause the main song while the video is actually playing
+      v.addEventListener("play", () => {
+        videoPlaying = true;
+        mainApply();
+      });
+      v.addEventListener("pause", () => {
+        videoPlaying = false;
+        mainApply();
+      });
+      v.addEventListener("ended", () => {
+        videoPlaying = false;
+        mainApply();
+      });
+
+      mbtn.onclick = () => {
+        // mute / unmute everything
+        muted = !muted;
+        mbtn.textContent = muted ? "🔇" : "🔊";
+        mainApply();
+        letterApply();
+      };
+
       window.onSceneChange = (i) => {
         if (i !== letterIdx) fx.classList.remove("on"); // decorations fade away when she leaves the letter
-        if (i !== letterIdx && CONFIG.musicOnlyInLetter && musicStarted) {
-          mbtn.classList.remove("on"); // hide the mute button too, the song is done
-          if (!bgm.paused) fadeTo(0, 1800, () => bgm.pause());
-        }
+        mainApply(); // enters letter → main song fades out · leaves letter → main song fades back in
+        letterApply(); // leaves letter → letter song fades out
       };
 
       /* ---------- Scene 4: wish → lantern floats away ---------- */

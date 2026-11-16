@@ -1,0 +1,2158 @@
+<!doctype html>
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  🌙 BIRTHDAY NIGHT-SKY PAGE  (fully commented version)       ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║  YOU ONLY NEED TO EDIT THE "CONFIG" BLOCK in the <script>    ║
+  ║  at the bottom of this file. Search for:  🔧 EDIT            ║
+  ║                                                              ║
+  ║  Checklist:                                                  ║
+  ║   1. Her name + your name                    (CONFIG)        ║
+  ║   2. 6 photos  → PHOTO SRC GOES HERE         (CONFIG.cards)  ║
+  ║   3. Your video → VIDEO SRC GOES HERE        (CONFIG.video)  ║
+  ║   4. Your messages / sweet note / final note (CONFIG)        ║
+  ║   5. Formspree ID → UPI ID arrives by email  (CONFIG)        ║
+  ║                                                              ║
+  ║  FOLDER SETUP: put this HTML file, the 6 photos and the      ║
+  ║  video in ONE folder, then zip the whole folder to share it. ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A star for you ✨</title>
+
+    <!-- Cute fonts from Google Fonts (needs internet; falls back to system fonts if offline) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Caveat:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ---------- COLORS (change these to restyle the whole page) ---------- */
+      :root {
+        --gold: #ffd98a; /* main glow color: titles, buttons, lines */
+        --rose: #ff9ec4; /* pink accent */
+        --ink: #f3eaff; /* normal text color */
+        --deep: #0b0a2a; /* dark navy used on hovered buttons */
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* Night-sky gradient background (purple at the bottom → dark navy at the top) */
+      body {
+        font-family: "Quicksand", system-ui, sans-serif;
+        color: var(--ink);
+        background: radial-gradient(
+          ellipse at 50% 120%,
+          #5b2a86 0%,
+          #241a5c 40%,
+          #0b0a2a 80%
+        );
+      }
+
+      /* ---------- BACKGROUND: twinkling stars, shooting stars, moon ---------- */
+      #sky {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+      }
+      #sky i {
+        position: absolute;
+        border-radius: 50%;
+        background: #fff;
+        animation: tw 3s ease-in-out infinite;
+      }
+      @keyframes tw {
+        50% {
+          opacity: 0.25;
+          transform: scale(0.6);
+        }
+      }
+      .shoot {
+        position: absolute;
+        width: 120px;
+        height: 2px;
+        background: linear-gradient(90deg, #fff, transparent);
+        transform: rotate(-30deg);
+        opacity: 0;
+        animation: shoot 9s linear infinite;
+      }
+      @keyframes shoot {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) rotate(-30deg);
+        }
+        3% {
+          opacity: 1;
+        }
+        12% {
+          opacity: 0;
+          transform: translate(-420px, 240px) rotate(-30deg);
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      .moon {
+        position: fixed;
+        top: 5vh;
+        right: 7vw;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        z-index: 0;
+        background: radial-gradient(
+          circle at 35% 35%,
+          #fffbe8,
+          #ffe9a8 60%,
+          #f2cd77
+        );
+        box-shadow: 0 0 40px 12px rgba(255, 230, 150, 0.35);
+        animation: float 6s ease-in-out infinite;
+      }
+      @keyframes float {
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      /* ---------- SCENES (each "page" fades in/out) ---------- */
+      .scene {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 26px 22px 40px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(24px);
+        transition:
+          opacity 0.8s,
+          transform 0.8s,
+          visibility 0.8s;
+        overflow-y: auto;
+      }
+      /* these two lines center the content AND let it scroll on small phones */
+      .scene > :first-child {
+        margin-top: auto;
+      }
+      .scene > :last-child {
+        margin-bottom: auto;
+      }
+      .scene.on {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
+
+      /* ---------- TEXT + BUTTONS ---------- */
+      h1,
+      h2 {
+        font-family: "Dancing Script", cursive;
+        font-weight: 700;
+        color: var(--gold);
+        text-shadow: 0 0 22px rgba(255, 217, 138, 0.45);
+      }
+      h1 {
+        font-size: clamp(2.6rem, 10vw, 4.6rem);
+        line-height: 1.05;
+      }
+      h2 {
+        font-size: clamp(2rem, 7vw, 3rem);
+        margin-bottom: 6px;
+      }
+      p.sub {
+        max-width: 370px;
+        line-height: 1.6;
+        opacity: 0.88;
+        margin-top: 10px;
+      }
+      .btn {
+        margin-top: 24px;
+        border: 1.5px solid var(--gold);
+        background: rgba(255, 217, 138, 0.1);
+        color: var(--gold);
+        font: inherit;
+        font-weight: 600;
+        font-size: 1.05rem;
+        padding: 12px 28px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition:
+          transform 0.25s,
+          background 0.25s,
+          box-shadow 0.25s;
+      }
+      .btn:hover {
+        background: var(--gold);
+        color: var(--deep);
+        box-shadow: 0 0 26px rgba(255, 217, 138, 0.6);
+        transform: translateY(-2px);
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: wait;
+      }
+      .btn.blue {
+        border-color: #9cc3ff;
+        color: #bcd7ff;
+        background: rgba(156, 195, 255, 0.1);
+      } /* the doggy "No" button is blue */
+      .btn.blue:hover {
+        background: #9cc3ff;
+        color: var(--deep);
+        box-shadow: 0 0 22px rgba(156, 195, 255, 0.6);
+      }
+      .btn.hide {
+        display: none;
+      }
+      .fade {
+        animation: fin 0.9s both;
+      }
+      @keyframes fin {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+      }
+      .tag {
+        font-size: 0.85rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--rose);
+        margin-bottom: 10px;
+      }
+      .pulse {
+        animation: pl 2.4s ease-in-out infinite;
+      }
+      @keyframes pl {
+        50% {
+          opacity: 0.55;
+          transform: scale(0.97);
+        }
+      }
+
+      /* ---------- SCENE 1: constellation (heart) ---------- */
+      svg.con {
+        width: min(340px, 88vw);
+        height: auto;
+        margin-top: 8px;
+        overflow: visible;
+      }
+      .ln {
+        stroke: var(--gold);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-dasharray: var(--l);
+        stroke-dashoffset: var(--l);
+        animation: draw 0.6s forwards;
+        filter: drop-shadow(0 0 4px var(--gold));
+      }
+      @keyframes draw {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+      .st {
+        cursor: pointer;
+      }
+      .st circle.core {
+        fill: #fff;
+      }
+      .st circle.halo {
+        fill: rgba(255, 217, 138, 0.25);
+      }
+      .st text {
+        fill: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        text-anchor: middle;
+        pointer-events: none;
+        opacity: 0.8;
+      }
+      .st.next circle.halo {
+        animation: halo 1.2s ease-in-out infinite;
+        fill: rgba(255, 217, 138, 0.5);
+      } /* the star she should tap next glows */
+      @keyframes halo {
+        50% {
+          r: 20;
+          opacity: 0.3;
+        }
+      }
+      .st.done circle.core {
+        fill: var(--gold);
+      }
+      .st.done circle.halo {
+        fill: rgba(255, 217, 138, 0.35);
+      }
+      .shake {
+        animation: shk 0.3s;
+      }
+      @keyframes shk {
+        25% {
+          transform: translateX(-4px);
+        }
+        75% {
+          transform: translateX(4px);
+        }
+      }
+      #conName {
+        min-height: 2.4rem;
+      }
+
+      /* ---------- SCENE 2: photo flip cards ---------- */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        width: min(400px, 92vw);
+        margin-top: 14px;
+      }
+      .card {
+        perspective: 800px;
+        height: 190px;
+        cursor: pointer;
+      } /* ← change 190px to make cards taller/shorter */
+      .card .in {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.7s;
+        transform-style: preserve-3d;
+      }
+      .card.flip .in {
+        transform: rotateY(180deg);
+      }
+      .card .f,
+      .card .b {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 18px;
+        overflow: hidden;
+      }
+      .card .f {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.14),
+          rgba(255, 255, 255, 0.04)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.25);
+      }
+      .card .f span {
+        animation: pl 2.4s infinite;
+      }
+      .card .b {
+        transform: rotateY(180deg);
+        background: linear-gradient(145deg, #ffd98a, #ff9ec4);
+        box-shadow: 0 0 22px rgba(255, 158, 196, 0.35);
+      }
+      .card .b img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      } /* object-fit:cover = photo fills the card, cropped nicely */
+      .card .b .ph {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3.4rem;
+      } /* placeholder when photo is missing */
+      .card .b .cap {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 26px 10px 9px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: #fff;
+        background: linear-gradient(transparent, rgba(30, 8, 50, 0.88));
+      } /* the message strip over the bottom of the photo */
+      .count {
+        margin-top: 12px;
+        opacity: 0.7;
+        font-size: 0.9rem;
+      }
+
+      /* ---------- SCENE 3: video ("tap the star" → glowing screen) ---------- */
+      /* ✨ SMOOTHNESS NOTE: only "transform" and "opacity" are animated (the GPU handles those → buttery smooth).
+   The star and the video screen sit on top of each other in the same spot (.stage) and cross-fade, so nothing "jumps". */
+      #vsub {
+        transition: opacity 0.5s;
+      }
+      .stage {
+        display: grid;
+        place-items: center;
+        margin-top: 18px;
+        width: 100%;
+      }
+      .stage > * {
+        grid-area: 1/1;
+      }
+      .starbtn {
+        position: relative;
+        isolation: isolate;
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        font-size: 3.2rem;
+        color: #5a2a00;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #fffbe0,
+          #ffd98a 55%,
+          #ffae5c
+        );
+        box-shadow: 0 0 30px 6px rgba(255, 217, 138, 0.45);
+        transition:
+          transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.6s ease;
+        will-change: transform, opacity;
+      }
+      .starbtn::before {
+        content: "";
+        position: absolute;
+        inset: -34px;
+        border-radius: 50%;
+        z-index: -1;
+        background: radial-gradient(
+          circle,
+          rgba(255, 217, 138, 0.6),
+          transparent 65%
+        );
+        animation: beat 1.8s ease-in-out infinite;
+      } /* pulsing glow (cheap: only scale + opacity) */
+      @keyframes beat {
+        50% {
+          transform: scale(1.25);
+          opacity: 0.55;
+        }
+      }
+      .starbtn.gone {
+        transform: scale(1.7);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .starbtn.gone::before {
+        animation: none;
+      }
+      .screen {
+        width: min(460px, 92vw);
+        padding: 10px;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1.5px solid rgba(255, 217, 138, 0.6);
+        box-shadow:
+          0 0 50px rgba(255, 217, 138, 0.3),
+          inset 0 0 30px rgba(255, 217, 138, 0.08);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(34px) scale(0.8);
+        will-change: transform, opacity;
+        transition:
+          opacity 0.9s ease,
+          transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s 1s;
+      }
+      .screen.show {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition-delay: 0.2s, 0.2s, 0s;
+      } /* zooms in smoothly while the star fades out */
+      .screen video {
+        width: 100%;
+        max-height: 58vh;
+        border-radius: 18px;
+        display: block;
+        background: #150a30;
+      }
+      .screen .ph {
+        display: none;
+        aspect-ratio: 16/9;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 8px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #3a2a7a, #7a3a8a);
+      } /* shown only if the video file isn't found */
+      .screen .ph b {
+        font-size: 3rem;
+      }
+      .vtitle {
+        margin-top: 14px;
+        font-family: "Dancing Script", cursive;
+        font-size: 1.7rem;
+        color: var(--gold);
+        opacity: 0;
+        transition: opacity 0.9s 0.7s;
+      }
+      .vtitle.on {
+        opacity: 1;
+      }
+
+      /* ---------- SCENE 3b: the LETTER (envelope opens → paper rises → text types itself) ---------- */
+      /* ✨ SMOOTHNESS NOTE: the envelope and the paper sit on top of each other in the same spot (.lstage) and cross-fade.
+   Only transform + opacity are animated, so it stays smooth even on phones. */
+      .lstage {
+        display: grid;
+        place-items: center;
+        margin-top: 14px;
+        width: 100%;
+      }
+      .lstage > * {
+        grid-area: 1/1;
+      }
+      .env {
+        position: relative;
+        width: min(300px, 80vw);
+        height: 200px;
+        cursor: pointer;
+        perspective: 900px;
+        transition:
+          transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.6s ease;
+        will-change: transform, opacity;
+      }
+      .env .box {
+        position: absolute;
+        inset: 0;
+        transform-style: preserve-3d;
+        animation: float 4s ease-in-out infinite;
+      } /* gentle floating */
+      .env .back {
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #6a3fa0, #41277a);
+        box-shadow: 0 0 40px rgba(180, 130, 255, 0.4);
+      }
+      .env .peek {
+        position: absolute;
+        left: 9%;
+        right: 9%;
+        top: 14%;
+        bottom: 10%;
+        background: #fff8e6;
+        border-radius: 6px;
+        z-index: 1;
+        transition: transform 0.8s 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      } /* the letter peeking out */
+      .env .fold {
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        z-index: 2;
+        background:
+          linear-gradient(135deg, transparent 50%, #7d4cb8 50%) left/50% 100%
+            no-repeat,
+          linear-gradient(225deg, transparent 50%, #7d4cb8 50%) right/50% 100%
+            no-repeat;
+      }
+      .env .flap {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 62%;
+        background: #8e5bd0;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+        transform-origin: top;
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 3;
+        border-radius: 12px 12px 0 0;
+        will-change: transform;
+      }
+      .env .seal {
+        position: absolute;
+        top: 44%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        font-size: 2.2rem;
+        transition: 0.4s;
+        animation: pl 1.8s ease-in-out infinite;
+        filter: drop-shadow(0 0 10px rgba(255, 217, 138, 0.8));
+      }
+      .env.open .flap {
+        transform: rotateX(180deg);
+      }
+      .env.open .seal {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+      }
+      .env.open .peek {
+        transform: translateY(-60px);
+      }
+      .env.gone {
+        transform: translateY(40px) scale(0.85);
+        opacity: 0;
+        pointer-events: none;
+      } /* envelope slides down + fades while the paper rises */
+      .sub.off {
+        animation: none;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+      .paper {
+        width: min(390px, 90vw);
+        height: min(56vh, 400px);
+        overflow-y: auto;
+        padding: 26px 24px;
+        border-radius: 14px;
+        text-align: left;
+        cursor: default;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(70px) scale(0.85) rotate(-3deg);
+        will-change: transform, opacity;
+        transition:
+          opacity 0.8s ease,
+          transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s 0.9s;
+        background-color: #fff8e6;
+        color: #5a3a52;
+        font-family: "Caveat", cursive;
+        font-size: 1.5rem;
+        line-height: 32px;
+        white-space: pre-wrap; /* ← "Caveat" = handwriting font */
+        background-image: repeating-linear-gradient(
+          transparent 0,
+          transparent 31px,
+          rgba(255, 158, 196, 0.4) 31px,
+          rgba(255, 158, 196, 0.4) 32px
+        );
+        box-shadow:
+          0 0 50px rgba(255, 217, 138, 0.35),
+          0 14px 40px rgba(0, 0, 0, 0.4);
+      }
+      .paper.show {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition-delay: 0s, 0s, 0s;
+      } /* rises up smoothly */
+      .caret::after {
+        content: "▌";
+        color: #ff7aa8;
+        animation: blink 0.7s infinite;
+      } /* the blinking typing cursor */
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* ---------- SCENE 4: wish + floating lantern ---------- */
+      textarea {
+        width: min(340px, 88vw);
+        height: 90px;
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1.5px solid rgba(255, 217, 138, 0.5);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font: inherit;
+        resize: none;
+        outline: none;
+        text-align: center;
+      }
+      textarea:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 20px rgba(255, 217, 138, 0.3);
+      }
+      textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .lantern {
+        position: fixed;
+        left: 50%;
+        bottom: -160px;
+        z-index: 5;
+        width: 96px;
+        transform: translateX(-50%);
+        text-align: center;
+        transition:
+          transform 9s ease-in,
+          opacity 9s ease-in;
+      }
+      .lantern .body {
+        height: 110px;
+        border-radius: 40% 40% 18% 18%;
+        background: radial-gradient(
+          ellipse at 50% 70%,
+          #fff3b8,
+          #ffb86b 60%,
+          #ff8a4c
+        );
+        box-shadow: 0 0 50px 18px rgba(255, 170, 90, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #7a3210;
+        padding: 12px;
+        line-height: 1.2;
+        overflow: hidden;
+      }
+      .lantern .base {
+        height: 12px;
+        margin: 0 22px;
+        border-radius: 0 0 8px 8px;
+        background: #a4511f;
+      }
+      .lantern.go {
+        transform: translate(-50%, -125vh);
+        opacity: 0;
+      } /* adding this class makes it float up and fade */
+
+      /* ---------- SCENE 5: sweet message + "Do you like me?" ---------- */
+      .letter {
+        max-width: 390px;
+        line-height: 1.75;
+        font-size: 1.05rem;
+        margin-top: 8px;
+        padding: 20px 22px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        white-space: pre-line;
+      }
+      .qrow {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 6px;
+        min-height: 70px;
+      }
+      #no.fly {
+        position: fixed;
+        margin: 0;
+        z-index: 60;
+        white-space: nowrap;
+      } /* once the doggy No starts running, it's positioned freely on screen */
+      .sad {
+        margin-top: 8px;
+        min-height: 1.4em;
+        opacity: 0.8;
+        font-size: 0.95rem;
+      }
+      .qe {
+        font-size: 3rem;
+        margin-top: 14px;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      /* ---------- SCENE 6: THE GRAND FINAL SURPRISE ----------
+   1) A glowing gift box floats. She taps it.   2) It wiggles, the lid flies off, golden rays + sparkles burst out.
+   3) The box fades and a golden gift card rises up with the UPI form.   4) After Send: "On its way!" then the final page.
+   (Only transform + opacity are animated, so it stays smooth.) */
+      .gstage {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        margin-top: 12px;
+      }
+      .gstage > * {
+        grid-area: 1/1;
+      }
+      .gbox {
+        position: relative;
+        width: 170px;
+        height: 200px;
+        cursor: pointer;
+        transition:
+          transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.7s ease;
+        will-change: transform, opacity;
+      }
+      .gbox .fl {
+        position: absolute;
+        inset: 0;
+        animation: float 3s ease-in-out infinite;
+      } /* gentle floating */
+      .gbox.wob .fl {
+        animation: wob 0.6s ease-in-out;
+      }
+      @keyframes wob {
+        0%,
+        100% {
+          transform: rotate(0);
+        }
+        20% {
+          transform: rotate(-9deg);
+        }
+        40% {
+          transform: rotate(8deg);
+        }
+        60% {
+          transform: rotate(-6deg);
+        }
+        80% {
+          transform: rotate(4deg);
+        }
+      }
+      .gbox .rays {
+        position: absolute;
+        left: 50%;
+        top: 45%;
+        width: 440px;
+        height: 440px;
+        margin: -220px 0 0 -220px;
+        opacity: 0;
+        transform: scale(0.3);
+        transition:
+          opacity 0.9s ease,
+          transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+      }
+      .gbox .rays::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        animation: spin 16s linear infinite;
+        background: repeating-conic-gradient(
+          rgba(255, 217, 138, 0.4) 0 7deg,
+          transparent 7deg 20deg
+        );
+        -webkit-mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+        mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+      } /* golden light beams */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .gbox .glow {
+        position: absolute;
+        left: 50%;
+        bottom: 100px;
+        width: 120px;
+        height: 120px;
+        margin-left: -60px;
+        border-radius: 50%;
+        opacity: 0;
+        transform: scale(0.4);
+        background: radial-gradient(
+          circle,
+          #fff8cf,
+          rgba(255, 217, 138, 0) 70%
+        );
+        transition:
+          opacity 0.8s ease,
+          transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .gbox .gb-body {
+        position: absolute;
+        bottom: 0;
+        left: 12px;
+        right: 12px;
+        height: 112px;
+        border-radius: 0 0 16px 16px;
+        background: linear-gradient(145deg, #ff9ec4, #b76bff);
+        box-shadow: 0 0 40px rgba(255, 158, 196, 0.45);
+      }
+      .gbox .gb-lid {
+        position: absolute;
+        bottom: 112px;
+        left: 0;
+        right: 0;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #ffb3d4, #c07dff);
+        transform-origin: left bottom;
+        transition:
+          transform 1s cubic-bezier(0.34, 1.4, 0.64, 1),
+          opacity 0.7s ease 0.3s;
+      }
+      .gbox .gb-body::before,
+      .gbox .gb-lid::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        width: 28px;
+        margin-left: -14px;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(#fff0b8, #ffd98a);
+      } /* the ribbon */
+      .gbox .gb-lid::after {
+        content: "🎀";
+        position: absolute;
+        left: 50%;
+        top: -30px;
+        transform: translateX(-50%);
+        font-size: 2.6rem;
+      } /* the bow */
+      .gbox.open .gb-lid {
+        transform: translate(-30px, -110px) rotate(-32deg);
+        opacity: 0;
+      }
+      .gbox.open .rays {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .gbox.open .glow {
+        opacity: 1;
+        transform: scale(2.4);
+      }
+      .gbox .sp {
+        position: absolute;
+        left: 50%;
+        bottom: 130px;
+      }
+      .gbox .sp span {
+        position: absolute;
+        left: -0.5em;
+        top: -0.5em;
+        font-size: 1.4rem;
+        opacity: 0;
+      }
+      .gbox.open .sp span {
+        animation: burst 1.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+        animation-delay: var(--d);
+      } /* sparkles fly out and fade */
+      @keyframes burst {
+        0% {
+          transform: translate(0, 0) scale(0);
+          opacity: 0;
+        }
+        15% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--x), var(--y)) scale(1.3);
+          opacity: 0;
+        }
+      }
+      .gbox.done {
+        transform: translateY(40px) scale(0.7);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .gcard {
+        width: min(360px, 90vw);
+        padding: 26px 22px 22px;
+        border-radius: 26px;
+        text-align: center;
+        background: linear-gradient(
+          160deg,
+          rgba(255, 217, 138, 0.2),
+          rgba(255, 158, 196, 0.14)
+        );
+        border: 1.5px solid rgba(255, 217, 138, 0.7);
+        box-shadow:
+          0 0 60px rgba(255, 217, 138, 0.35),
+          inset 0 0 30px rgba(255, 255, 255, 0.06);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(90px) scale(0.8);
+        will-change: transform, opacity;
+        transition:
+          opacity 0.9s ease,
+          transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s 1.1s;
+      }
+      .gcard.show {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition-delay: 0s;
+      } /* the card rises up */
+      .gcard.done {
+        opacity: 0;
+        transform: translateY(-40px) scale(0.9);
+        transition:
+          opacity 0.6s ease,
+          transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .gcard .gt {
+        font-family: "Dancing Script", cursive;
+        font-weight: 700;
+        font-size: 2.2rem;
+        color: var(--gold);
+        text-shadow: 0 0 20px rgba(255, 217, 138, 0.5);
+        line-height: 1.1;
+      }
+      .gcard p {
+        margin-top: 8px;
+        line-height: 1.6;
+        opacity: 0.92;
+      }
+      .gcard .lock {
+        margin-top: 10px;
+        font-size: 0.78rem;
+        opacity: 0.6;
+      }
+      .sentmsg {
+        text-align: center;
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.6);
+        transition:
+          opacity 0.8s ease,
+          transform 1s cubic-bezier(0.34, 1.4, 0.64, 1),
+          visibility 0s 1s;
+      }
+      .sentmsg.show {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition-delay: 0s;
+      }
+      .sentmsg b {
+        display: block;
+        font-family: "Dancing Script", cursive;
+        font-size: clamp(2.4rem, 9vw, 3.4rem);
+        color: var(--gold);
+        text-shadow: 0 0 30px rgba(255, 217, 138, 0.6);
+      }
+      .sentmsg span {
+        font-size: 3.4rem;
+        display: inline-block;
+        animation: float 1.6s ease-in-out infinite;
+      }
+      .input {
+        width: min(330px, 85vw);
+        padding: 14px 20px;
+        margin-top: 18px;
+        font: inherit;
+        font-size: 1.1rem;
+        text-align: center;
+        color: #fff;
+        border: 1.5px solid rgba(255, 217, 138, 0.55);
+        border-radius: 999px;
+        outline: none;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .input:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 22px rgba(255, 217, 138, 0.35);
+      }
+      .input::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .err {
+        color: var(--rose);
+        min-height: 1.3em;
+        margin-top: 8px;
+        font-size: 0.95rem;
+      }
+      .hp {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+        height: 0;
+        width: 0;
+      } /* hidden "honeypot" field that blocks spam bots */
+
+      /* ---------- SCENE 7: final page ---------- */
+      .final .big {
+        font-family: "Dancing Script", cursive;
+        font-size: clamp(3rem, 13vw, 5.5rem);
+        color: var(--gold);
+        line-height: 1;
+        text-shadow: 0 0 30px rgba(255, 217, 138, 0.6);
+      }
+      .note {
+        max-width: 390px;
+        line-height: 1.75;
+        margin-top: 16px;
+        font-size: 1.05rem;
+        white-space: pre-line;
+      }
+
+      /* little progress dots at the bottom */
+      .dots {
+        position: fixed;
+        bottom: 14px;
+        left: 0;
+        right: 0;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        z-index: 9;
+        pointer-events: none;
+      }
+      .dots b {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transition: 0.3s;
+      }
+      .dots b.on {
+        background: var(--gold);
+        box-shadow: 0 0 8px var(--gold);
+        transform: scale(1.4);
+      }
+
+      /* ---------- ✨ LETTER SCENE PRETTY-UP (new) ----------
+         While the letter is being typed, a dreamy layer appears BEHIND the paper:
+         soft glowing colour clouds, drifting hearts/petals/sparkles and fireflies.
+         Everything only animates transform + opacity, so it stays smooth on phones. */
+      #letterFx {
+        position: fixed;
+        inset: 0;
+        z-index: 1; /* above the sky (0), below the scenes (2) */
+        pointer-events: none;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 1.6s ease;
+      }
+      #letterFx.on {
+        opacity: 1;
+      }
+      #letterFx .blob {
+        position: absolute;
+        width: 70vmax;
+        height: 70vmax;
+        border-radius: 50%;
+        filter: blur(40px);
+        will-change: transform;
+        animation: drift 14s ease-in-out infinite alternate;
+      }
+      #letterFx .b1 {
+        left: -25vmax;
+        top: -20vmax;
+        background: radial-gradient(
+          circle,
+          rgba(255, 158, 196, 0.32),
+          transparent 65%
+        );
+      }
+      #letterFx .b2 {
+        right: -28vmax;
+        bottom: -26vmax;
+        background: radial-gradient(
+          circle,
+          rgba(255, 217, 138, 0.26),
+          transparent 65%
+        );
+        animation-duration: 18s;
+        animation-direction: alternate-reverse;
+      }
+      #letterFx .b3 {
+        left: 15vw;
+        bottom: -35vmax;
+        background: radial-gradient(
+          circle,
+          rgba(176, 120, 255, 0.3),
+          transparent 65%
+        );
+        animation-duration: 22s;
+      }
+      @keyframes drift {
+        to {
+          transform: translate(8vmax, 6vmax) scale(1.12);
+        }
+      }
+      #letterFx .fl {
+        position: absolute;
+        bottom: -50px;
+        opacity: 0;
+        will-change: transform, opacity;
+        animation: rise linear infinite;
+        filter: drop-shadow(0 0 6px rgba(255, 200, 220, 0.7));
+      } /* hearts / petals / sparkles floating upward */
+      @keyframes rise {
+        0% {
+          transform: translate(0, 0) rotate(0deg) scale(0.7);
+          opacity: 0;
+        }
+        12% {
+          opacity: 0.9;
+        }
+        85% {
+          opacity: 0.7;
+        }
+        100% {
+          transform: translate(var(--dx), -112vh) rotate(var(--rot)) scale(1.1);
+          opacity: 0;
+        }
+      }
+      #letterFx .ff {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff6c8;
+        box-shadow: 0 0 10px 3px rgba(255, 230, 150, 0.8);
+        will-change: transform, opacity;
+        animation: flit 6s ease-in-out infinite;
+      } /* little fireflies */
+      @keyframes flit {
+        0%,
+        100% {
+          transform: translate(0, 0);
+          opacity: 0.1;
+        }
+        25% {
+          opacity: 1;
+        }
+        50% {
+          transform: translate(var(--fx), var(--fy));
+          opacity: 0.3;
+        }
+        75% {
+          opacity: 1;
+        }
+      }
+
+      /* soft glowing aura behind the paper (shares the paper's spot in .lstage) */
+      .lstage::before {
+        content: "";
+        grid-area: 1/1;
+        width: min(560px, 120vw);
+        height: min(560px, 90vh);
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 190, 215, 0.4),
+          rgba(255, 217, 138, 0.18) 45%,
+          transparent 70%
+        );
+        opacity: 0;
+        transform: scale(0.7);
+        pointer-events: none;
+        transition:
+          opacity 1.4s ease,
+          transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .lstage.fx::before {
+        opacity: 1;
+        transform: none;
+        animation: aura 4.5s ease-in-out infinite 1.6s;
+      }
+      @keyframes aura {
+        50% {
+          transform: scale(1.08);
+          opacity: 0.7;
+        }
+      }
+      /* sparkles + flowers that hug the edges of the paper */
+      .lorbit {
+        grid-area: 1/1;
+        position: relative;
+        width: min(390px, 90vw);
+        height: min(56vh, 400px);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.2s ease 0.6s;
+      }
+      .lstage.fx .lorbit {
+        opacity: 1;
+      }
+      .lorbit span {
+        position: absolute;
+        font-size: 1.5rem;
+        animation: float 3.4s ease-in-out infinite;
+        filter: drop-shadow(0 0 8px rgba(255, 217, 138, 0.8));
+      }
+      .lorbit .o1 {
+        left: -14px;
+        top: -16px;
+      }
+      .lorbit .o2 {
+        right: -14px;
+        top: -18px;
+        animation-delay: -1s;
+      }
+      .lorbit .o3 {
+        left: -16px;
+        bottom: -14px;
+        animation-delay: -2s;
+      }
+      .lorbit .o4 {
+        right: -16px;
+        bottom: -16px;
+        animation-delay: -0.5s;
+      }
+      .lorbit .o5 {
+        left: 50%;
+        top: -22px;
+        margin-left: -12px;
+        animation-delay: -1.5s;
+        font-size: 1.2rem;
+      }
+      .lorbit .o6 {
+        left: 50%;
+        bottom: -22px;
+        margin-left: -12px;
+        animation-delay: -2.5s;
+        font-size: 1.2rem;
+      }
+      /* paper gets a slightly warmer glow while it is being written */
+      .paper.show {
+        box-shadow:
+          0 0 70px rgba(255, 190, 215, 0.5),
+          0 0 30px rgba(255, 217, 138, 0.4),
+          0 14px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      /* 🔊 tiny music on/off button (appears only when music is playing) */
+      .musicbtn {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 10;
+        display: none;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        font-size: 1.15rem;
+        cursor: pointer;
+        color: var(--gold);
+        border: 1.5px solid rgba(255, 217, 138, 0.6);
+        background: rgba(255, 217, 138, 0.1);
+        backdrop-filter: blur(4px);
+      }
+      .musicbtn.on {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background layer: stars are added by JavaScript below -->
+    <div id="sky">
+      <div class="shoot" style="top: 8%; left: 80%"></div>
+      <div
+        class="shoot"
+        style="top: 25%; left: 95%; animation-delay: 4.5s"
+      ></div>
+    </div>
+    <div class="moon"></div>
+
+    <!-- ✨ NEW: dreamy decoration layer shown behind the letter (filled by JavaScript) -->
+    <div id="letterFx">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+    </div>
+
+    <!-- ═════════ SCENE 0: Intro ═════════ -->
+    <section class="scene on" id="s0">
+      <div class="tag">hey you!!...</div>
+      <h1>Aastha's birthday<br />is here ✨</h1>
+      <p class="sub pulse">
+        I made you a whatever this is. Wanna look up at the sky for a sec?
+      </p>
+      <!-- Any button with "data-next" automatically goes to the next scene -->
+      <button class="btn" data-next>Look up 🌙</button>
+    </section>
+
+    <!-- ═════════ SCENE 1: Connect the stars (draws a heart) ═════════ -->
+    <section class="scene" id="s1">
+      <div class="tag">tiny mission</div>
+      <h2>Connect the stars</h2>
+      <p class="sub" id="conHint">Can u spot the pattern....?</p>
+      <svg class="con" id="con" viewBox="0 0 300 260"></svg>
+      <!-- stars are drawn here by JavaScript -->
+      <h2 id="conName"></h2>
+      <button class="btn hide" data-next>Keep going 💫</button>
+      <!-- appears after the heart is complete -->
+    </section>
+
+    <!-- ═════════ SCENE 2: Photo cards (photos come from CONFIG.cards) ═════════ -->
+    <section class="scene" id="s2">
+      <div class="tag">stars with your face on them</div>
+      <h2>Pick a star</h2>
+      <p class="sub">
+        tap a star, and each one contains something i cant tell u directly!
+      </p>
+      <div class="cards" id="cards"></div>
+      <!-- 6 cards are created here by JavaScript -->
+      <div class="count" id="cnt"></div>
+      <button class="btn hide" data-next>There's more 🎬</button>
+      <!-- appears after all cards are flipped -->
+    </section>
+
+    <!-- ═════════ SCENE 3: Video (video comes from CONFIG.video) ═════════ -->
+    <section class="scene" id="s3">
+      <div class="tag">a transmission from earth</div>
+      <h2>A message for you</h2>
+      <p class="sub" id="vsub">
+        I recorded something. Tap the star to receive it. 🌟
+      </p>
+      <!-- The star button and the video screen share the same spot (.stage) and cross-fade -->
+      <div class="stage">
+        <button class="starbtn" id="starbtn" aria-label="play">▶</button>
+        <div class="screen" id="screen">
+          <!-- The video's file name is set in CONFIG.video (JavaScript below) -->
+          <video id="vid" controls playsinline preload="metadata"></video>
+          <div class="ph" id="vph"><b>🎞️</b>Your video goes here!</div>
+          <!-- shown only if the video file is missing -->
+        </div>
+      </div>
+      <div class="vtitle" id="vtitle">press play, birthday star ✨</div>
+      <button class="btn hide" data-next>Next 🏮</button>
+    </section>
+
+    <!-- ═════════ SCENE 3b: The letter (text comes from CONFIG.letter) ═════════
+     1) She sees a closed envelope with a glowing moon seal and taps it.
+     2) The flap opens, the envelope fades away, and the paper rises up.
+     3) The letter TYPES ITSELF out like a typewriter (it can't be skipped).
+     4) The Next button appears when the letter finishes. -->
+    <section class="scene" id="sLetter">
+      <div class="tag">a letter, just for you</div>
+      <h2 id="letterTitle">You've got mail</h2>
+      <!-- envelope and paper share the same spot (.lstage) and cross-fade -->
+      <div class="lstage">
+        <div class="env" id="env">
+          <div class="box">
+            <div class="back"></div>
+            <div class="peek"></div>
+            <div class="fold"></div>
+            <div class="flap"></div>
+            <div class="seal">🌙</div>
+          </div>
+        </div>
+        <div class="paper" id="paper"></div>
+        <!-- ✨ NEW: sparkles / flowers hugging the paper's edges (they appear when the paper rises) -->
+        <div class="lorbit">
+          <span class="o1">🌸</span><span class="o2">✨</span>
+          <span class="o3">💖</span><span class="o4">🌷</span>
+          <span class="o5">⭐</span><span class="o6">🌙</span>
+        </div>
+      </div>
+      <p class="sub pulse" id="envHint">Tap the envelope 💌</p>
+      <button class="btn hide" id="letterNext" data-next>Next 🏮</button>
+    </section>
+
+    <!-- ═════════ SCENE 4: Make a wish ═════════ -->
+    <section class="scene" id="s4">
+      <div class="tag">birthday tradition</div>
+      <h2>Make a wish</h2>
+      <p class="sub">
+        Write it here, and I'll send it up on a lantern. I promise I won't peek.
+        (…much.)
+      </p>
+      <textarea id="wish" maxlength="60" placeholder="I wish for…"></textarea>
+      <button class="btn" id="release">Release the lantern 🏮</button>
+    </section>
+
+    <!-- ═════════ SCENE 5: Sweet message + "Do you like me?" ═════════ -->
+    <section class="scene" id="s5">
+      <div class="letter" id="sweet"></div>
+      <!-- text comes from CONFIG.sweet -->
+      <div class="qe" id="qe">🥺</div>
+      <h2 style="margin-top: 6px">Do you like me?</h2>
+      <div class="qrow" id="qrow">
+        <button class="btn" id="yes" style="margin: 0">Yes 💖</button>
+        <!-- The "No" button runs away when she tries to tap it (see the "doggy No" part of the script) -->
+        <button class="btn blue" id="no" style="margin: 0">No 🐶</button>
+      </div>
+      <div class="sad" id="sad"></div>
+    </section>
+
+    <!-- ═════════ SCENE 6: UPI gift form — works with FORMSPREE ═════════
+     How it works:
+       • She types her UPI ID and presses Send.
+       • The script sends it to Formspree (formspree.io) in the background.
+       • Formspree emails the UPI ID to YOU.
+       • She is then taken to the final page.
+     Setup is in the CONFIG block below (look for "formspreeId").
+     The "name" attributes (upi, _gotcha) matter: Formspree uses them as field names in your email. -->
+    <section class="scene" id="s6">
+      <div class="tag">the final surprise</div>
+      <h2>One last little thing</h2>
+      <p class="sub" id="gsub">
+        I couldn't leave without this one. Tap the box 🎁
+      </p>
+
+      <div class="gstage">
+        <!-- 1) The gift box (sparkles are added to .sp by JavaScript) -->
+        <div class="gbox" id="gbox">
+          <div class="fl">
+            <div class="rays"></div>
+            <div class="glow"></div>
+            <div class="gb-body"></div>
+            <div class="gb-lid"></div>
+            <div class="sp" id="sp"></div>
+          </div>
+        </div>
+
+        <!-- 2) The golden card that rises out of the box. The UPI form (Formspree) lives inside it.
+            ✏️ You can change the card text below. -->
+        <div class="gcard" id="gcard">
+          <div class="gt">I wish I was there 🥺</div>
+          <p>
+            I'm sorry I can't hand you a gift in person, I'm just too far
+            away.<br />So please let me send a little something, so you can
+            treat yourself to cake, chocolates, anything you like 🍰<br /><br />Pls
+            share your UPI ID?
+          </p>
+
+          <!-- id="giftForm" is handled by JavaScript, so there's no page reload and she stays on this page. -->
+          <form id="giftForm" novalidate>
+            <input
+              class="input"
+              id="upi"
+              name="upi"
+              placeholder="yourname@upi"
+              autocomplete="off"
+              autocapitalize="off"
+            />
+            <!-- Honeypot: real people never see/fill this. Formspree discards submissions where it's filled (spam bots). -->
+            <input
+              class="hp"
+              type="text"
+              name="_gotcha"
+              tabindex="-1"
+              autocomplete="off"
+            />
+            <div class="err" id="err"></div>
+            <button class="btn" id="send" type="submit" style="margin-top: 6px">
+              Send 💌
+            </button>
+          </form>
+          <div class="lock">🔒 Only used to send it to you</div>
+        </div>
+
+        <!-- 3) "On its way!" message shown after the UPI ID is sent, right before the final page -->
+        <div class="sentmsg" id="sent">
+          <span>💌</span><b>On its way, with love 💛</b>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════ SCENE 7: Final birthday page ═════════ -->
+    <section class="scene final" id="s7">
+      <div style="font-size: 3rem">🎂✨</div>
+      <div class="big">Happy Birthday,<br /><span class="nm">you</span>!</div>
+      <p class="note" id="finalNote"></p>
+      <button class="btn" id="again">Replay 🔁</button>
+    </section>
+
+    <div class="dots" id="dots"></div>
+
+    <!-- ═════════ 🎵 BACKGROUND MUSIC ═════════
+         🎵 AUDIO GOES HERE (1 of 2 — the player itself):
+         You do NOT need to edit this tag. The song's file name is set in CONFIG.music
+         (search for "AUDIO SRC GOES HERE" in the script below). It starts when she taps the
+         envelope, fades in gently, and loops. -->
+    <audio id="bgm" loop preload="auto"></audio>
+    <button class="musicbtn" id="musicBtn" aria-label="music on/off">🔊</button>
+
+    <script>
+      /* ═══════════════════════════════════════════════════════════════
+   🔧 EDIT — THIS IS THE ONLY PART YOU NEED TO CHANGE
+   ═══════════════════════════════════════════════════════════════ */
+      const CONFIG = {
+        /* ── 1. NAMES ─────────────────────────────────────────────── */
+        herName: "you", // 🔧 EDIT: her name or nickname (shown on the heart + final page)
+        yourName: "Me", // 🔧 EDIT: your name (signs the final note)
+        conName: "The Constellation of", // shows as "The Constellation of <her name>"
+
+        /* ── 2. PHOTO CARDS ───────────────────────────────────────── */
+        // 📸 PHOTO SRC GOES HERE:
+        //   • Put your 6 photos in the SAME folder as this HTML file.
+        //   • Write each photo's file name in "img" (e.g. "her1.jpg", "trip.png").
+        //   • Names are CASE-SENSITIVE: "Her1.JPG" is NOT "her1.jpg".
+        //   • Tip: shrink photos to ~1000px wide so the page loads fast.
+        //   • You can also use a full web link, e.g. "https://example.com/pic.jpg".
+        //   • "msg" is the text shown over the bottom of that photo after the card flips.
+        //   • If a photo is missing/wrong name, a cute emoji placeholder shows instead.
+        cards: [
+          { img: "first.jpg", msg: "This smile. Unfair. 😭" }, // 🔧 EDIT photo 1 + message
+          { img: "second.jpg", msg: "Your laugh is my favorite notification." }, // 🔧 EDIT photo 2 + message
+          { img: "third.jpg", msg: "You make ordinary days feel special." }, // 🔧 EDIT photo 3 + message
+          { img: "fourth.jpg", msg: "Way cooler than you think. Seriously." }, // 🔧 EDIT photo 4 + message
+          {
+            img: "seventh.jpg",
+            msg: "Talking to you is the best part of my night 🌙",
+          }, // 🔧 EDIT photo 5 + message
+          { img: "sixth.jpg", msg: "Okay fine… you've got my attention. 😌" }, // 🔧 EDIT photo 6 + message
+        ],
+        // (Want more or fewer photos? Just add or delete lines above. 4 or 6 looks best.)
+
+        /* ── 3. VIDEO ─────────────────────────────────────────────── */
+        // 🎬 VIDEO SRC GOES HERE:
+        //   • Put your video in the SAME folder as this HTML file and write its file name below.
+        //   • .mp4 (H.264) works on every phone and browser. Avoid .mov / .mkv.
+        //   • Keep it small (under ~30 MB) so it plays quickly. A 1–2 min video is perfect.
+        //   • You can also use a full web link, e.g. "https://example.com/video.mp4".
+        //   • If the file isn't found, a "Your video goes here!" box shows instead.
+        video: "video.mp4", // 🔧 EDIT: your video file name
+
+        /* ── 3b. THE LETTER ───────────────────────────────────────── */
+        // ✉️ LETTER TEXT GOES HERE. It's typed out letter-by-letter in a handwriting font.
+        //   • \n = new line   (use \n\n for a blank line between paragraphs)
+        //   • {name} is automatically replaced with herName above.
+        //   • Short-to-medium length (100–200 words) feels best. Long letters take a while to type!
+        letter:
+          "Dear {name},\n\nHappy Birthday! 🎂\n\nI wanted to write this the old-fashioned way, because you deserve something a little special.\n\nSince we started talking, my days have felt lighter. You have this way of making me smile without even trying, and I really, really like that about you.\n\nI hope this year brings you every good thing: laughter, success, peace, and people who love you the way you deserve.\n\nThank you for being you. 💛\n\nYours,\n" +
+          "[YOUR NAME]", // 🔧 EDIT: write your own letter (and replace [YOUR NAME])
+        letterTitle: "You've got mail", // 🔧 EDIT: heading above the envelope
+        typingSpeed: 40, // 🔧 EDIT: milliseconds per letter. Lower = faster (25 = quick, 60 = slow & dramatic)
+
+        /* ── 3c. BACKGROUND MUSIC (plays while the letter is being written) ── */
+        // 🎵 AUDIO SRC GOES HERE (2 of 2 — this is the line you edit):
+        //   • Put your song in the SAME folder as this HTML file and write its file name below.
+        //   • .mp3 works on every phone and browser (.m4a / .ogg also fine).
+        //   • File names are CASE-SENSITIVE: "Song.MP3" is NOT "song.mp3".
+        //   • Keep it under ~5 MB so it loads fast. A soft, slow, instrumental song suits the letter best.
+        //   • You can also use a full web link, e.g. "https://example.com/song.mp3".
+        //   • Leave it as "" (empty) for no music. If the file isn't found, the page just stays silent (nothing breaks).
+        //   • It starts when she taps the envelope (browsers only allow sound after a tap) and loops.
+        music: "risk.mp3", // 🔧 EDIT: your audio file name
+        musicVolume: 0.5, // 🔧 EDIT: 0 (silent) to 1 (full). 0.4–0.6 is nice background level
+        musicOnlyInLetter: true, // 🔧 EDIT: true = song fades out when she leaves the letter page, false = keeps playing softly until the end
+
+        /* ── 4. MESSAGES ──────────────────────────────────────────── */
+        // Sweet message shown right before "Do you like me?"   (\n = new line)
+        sweet:
+          "Honestly, I'm really glad I got to know you.\n\nYou make my days a little brighter, my nights a little calmer, and my phone a lot more interesting. 💛\n\nI've been wanting to ask you something…", // 🔧 EDIT
+
+        // Final birthday note (your name is added automatically at the end)
+        finalNote:
+          "Hope today is full of cake, people who adore you, and wishes that actually come true. You deserve all the happiness in the world.\n\nThank you for being you. 💛\n— ", // 🔧 EDIT
+
+        /* ── 5. FORMSPREE (this is how you receive her UPI ID) ───────
+     A web page can't email you by itself, so we use Formspree (free):
+
+       STEP 1. Go to https://formspree.io and sign up (use YOUR email).
+       STEP 2. Click "+ New Form", give it any name (e.g. "Birthday gift"),
+               and set the email where you want to receive the UPI ID.
+       STEP 3. Formspree shows a form URL like:
+                   https://formspree.io/f/xyzabcde
+               The last part ("xyzabcde") is your FORM ID. Copy it below.
+       STEP 4. Check your inbox for Formspree's confirmation email and click
+               the confirm link (the form won't deliver until you do this).
+       STEP 5. TEST IT: open this page, jump to the UPI screen, submit a fake
+               ID like test@upi, and check that the email arrives.
+
+     Notes:
+       • Free plan = about 50 submissions/month. More than enough for one gift 😄
+       • You'll see her answer in your email AND in the Formspree dashboard
+         (Submissions tab), so you won't lose it.
+       • If Formspree complains about sending from a local file, upload the
+         folder to a free host (Netlify Drop, GitHub Pages) and test from there.
+  ─────────────────────────────────────────────────────────────── */
+        formspreeId: "YOUR_FORM_ID", // 🔧 EDIT: paste ONLY the ID, e.g. "xyzabcde"  (NOT the full link)
+        emailSubject: "🎁 Birthday gift: her UPI ID!", // the subject line of the email you receive
+      };
+      /* ═══════════════════════════════════════════════════════════════
+   ⛔ EVERYTHING BELOW IS THE ENGINE. You don't need to touch it.
+   ═══════════════════════════════════════════════════════════════ */
+
+      const $ = (s) => document.querySelector(s);
+
+      // Put her name / your name / messages into the page
+      document
+        .querySelectorAll(".nm")
+        .forEach((e) => (e.textContent = CONFIG.herName));
+      $("#sweet").textContent = CONFIG.sweet;
+      $("#finalNote").textContent = CONFIG.finalNote + CONFIG.yourName + " 🌙";
+
+      /* ---------- Background twinkling stars (70 tiny dots) ---------- */
+      const sky = $("#sky");
+      for (let i = 0; i < 70; i++) {
+        const s = document.createElement("i"),
+          z = 1 + Math.random() * 2.2;
+        s.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;width:${z}px;height:${z}px;opacity:${0.4 + Math.random() * 0.6};animation-delay:${-Math.random() * 3}s;animation-duration:${2 + Math.random() * 3}s`;
+        sky.appendChild(s);
+      }
+
+      /* ---------- Moving between scenes ---------- */
+      const sc = [...document.querySelectorAll(".scene")];
+      let cur = 0;
+      $("#dots").innerHTML = sc.map(() => "<b></b>").join("");
+      function go(i) {
+        // go(3) = jump to scene number 3 (video)
+        sc[cur].classList.remove("on");
+        cur = i;
+        sc[cur].classList.add("on");
+        [...$("#dots").children].forEach((d, k) =>
+          d.classList.toggle("on", k === cur),
+        );
+        if (cur !== 3) $("#vid").pause(); // stop the video if she leaves the video page
+        if (window.onSceneChange) window.onSceneChange(cur); // ✨ NEW: lets the letter decorations + music react to scene changes
+      }
+      go(0);
+      document
+        .querySelectorAll("[data-next]")
+        .forEach((b) => (b.onclick = () => go(cur + 1)));
+
+      /* ---------- Scene 1: connect the stars → heart ---------- */
+      // x,y position of each of the 10 stars (they trace a heart, starting from the bottom tip)
+      const pts = [
+        [150, 228],
+        [85, 168],
+        [48, 108],
+        [72, 56],
+        [120, 48],
+        [150, 96],
+        [180, 48],
+        [228, 56],
+        [252, 108],
+        [215, 168],
+      ];
+      const con = $("#con"),
+        NS = "http://www.w3.org/2000/svg";
+      let step = 0; // which star she must tap next
+      function el(t, a) {
+        const e = document.createElementNS(NS, t);
+        for (const k in a) e.setAttribute(k, a[k]);
+        return e;
+      }
+      const lines = el("g", {});
+      con.appendChild(lines);
+      const stars = pts.map((p, i) => {
+        const g = el("g", { class: "st" });
+        g.append(
+          el("circle", { class: "halo", cx: p[0], cy: p[1], r: 14 }),
+          el("circle", { class: "core", cx: p[0], cy: p[1], r: 5 }),
+        );
+        const t = el("text", { x: p[0], y: p[1] - 12 });
+        t.textContent = i + 1;
+        g.appendChild(t);
+        g.onclick = () => pick(i);
+        con.appendChild(g);
+        return g;
+      });
+      stars[0].classList.add("next");
+      function line(a, b) {
+        // draws an animated glowing line between two stars
+        const l = Math.hypot(a[0] - b[0], a[1] - b[1]);
+        lines.appendChild(
+          el("line", {
+            class: "ln",
+            x1: a[0],
+            y1: a[1],
+            x2: b[0],
+            y2: b[1],
+            style: `--l:${l}`,
+          }),
+        );
+      }
+      function pick(i) {
+        if (step >= pts.length) return;
+        if (i !== step) {
+          stars[i].classList.add("shake");
+          setTimeout(() => stars[i].classList.remove("shake"), 300);
+          return;
+        } // wrong star = shake
+        stars[i].classList.remove("next");
+        stars[i].classList.add("done");
+        if (i > 0) line(pts[i - 1], pts[i]);
+        step++;
+        if (step < pts.length) stars[step].classList.add("next");
+        else {
+          // all 10 done → close the heart + show the name + next button
+          setTimeout(() => line(pts[pts.length - 1], pts[0]), 200);
+          setTimeout(() => {
+            $("#conHint").textContent = "It's a heart. Of course it is. 😌";
+            $("#conName").textContent = CONFIG.conName + " " + CONFIG.herName;
+            $("#conName").classList.add("fade");
+            const b = $("#s1 .btn");
+            b.classList.remove("hide");
+            b.classList.add("fade");
+          }, 900);
+        }
+      }
+
+      /* ---------- Scene 2: photo cards ---------- */
+      const icons = ["🌸", "🦋", "🌷", "🍓", "🌼", "💖"]; // placeholders used when a photo can't be found
+      let flipped = 0;
+      CONFIG.cards.forEach((c, i) => {
+        const d = document.createElement("div");
+        d.className = "card";
+        d.innerHTML = `<div class="in"><div class="f"><span>⭐</span></div><div class="b"><img alt=""><div class="cap"></div></div></div>`;
+        const img = d.querySelector("img");
+        d.querySelector(".cap").textContent = c.msg; // the message over the photo
+        img.src = c.img; // 📸 the photo file name from CONFIG.cards is used here
+        img.onerror = () => {
+          const p = document.createElement("div");
+          p.className = "ph";
+          p.textContent = icons[i % 6];
+          img.replaceWith(p);
+        }; // photo not found → emoji
+        d.onclick = () => {
+          if (d.classList.contains("flip")) return;
+          d.classList.add("flip");
+          flipped++;
+          $("#cnt").textContent =
+            flipped < CONFIG.cards.length
+              ? `${flipped} / ${CONFIG.cards.length} found`
+              : "all stars found ✨";
+          if (flipped === CONFIG.cards.length) {
+            const b = $("#s2 .btn");
+            b.classList.remove("hide");
+            b.classList.add("fade");
+          } // all flipped → show Next
+        };
+        $("#cards").appendChild(d);
+      });
+      $("#cnt").textContent = `0 / ${CONFIG.cards.length} found`;
+
+      /* ---------- Scene 3: video (tap the star → it expands into a glowing screen) ---------- */
+      const v = $("#vid");
+      v.src = CONFIG.video; // 🎬 the video file name from CONFIG.video is used here
+      let vShown = false;
+      function showNext() {
+        const b = $("#s3 .btn");
+        b.classList.remove("hide");
+        b.classList.add("fade");
+      }
+      v.onerror = () => {
+        v.style.display = "none";
+        $("#vph").style.display = "flex";
+        showNext();
+      }; // video missing → placeholder box
+      v.addEventListener("ended", showNext); // Next button appears when the video finishes…
+      $("#starbtn").onclick = () => {
+        if (vShown) return;
+        vShown = true;
+        $("#starbtn").classList.add("gone"); // star grows a little + fades out
+        $("#vsub").style.opacity = 0; // the hint text fades out
+        $("#screen").classList.add("show"); // the screen zooms in at the same time (cross-fade = smooth)
+        $("#vtitle").classList.add("on");
+        v.play().catch(() => {}); // starts playing right on her tap (browsers only allow this straight after a tap)
+        setTimeout(showNext, 6500); // …or 6.5 seconds later, so she's never stuck
+      };
+
+      /* ---------- Scene 3b: the letter (envelope opens → typing animation) ---------- */
+      $("#letterTitle").textContent = CONFIG.letterTitle;
+      let letterOpened = false,
+        typingDone = false,
+        typeTimer = null;
+      const paper = $("#paper");
+      const letterText = CONFIG.letter.replace(/\{name\}/g, CONFIG.herName);
+      function finishTyping() {
+        // shows the full letter + the Next button
+        clearTimeout(typeTimer);
+        typingDone = true;
+        paper.textContent = letterText;
+        paper.classList.remove("caret");
+        paper.scrollTop = paper.scrollHeight;
+        const b = $("#letterNext");
+        b.classList.remove("hide");
+        b.classList.add("fade");
+      }
+      $("#env").onclick = () => {
+        if (letterOpened) return;
+        letterOpened = true;
+        if (window.musicPlay) window.musicPlay(); // 🎵 NEW: music starts right on her tap (browsers only allow this straight after a tap)
+        $("#envHint").classList.add("off"); // hint fades out
+        $("#env").classList.add("open"); // 1) flap opens, letter peeks out
+        setTimeout(() => {
+          $("#env").classList.add("gone"); // 2) envelope slides down + fades…
+          paper.classList.add("show", "caret"); //    …while the paper rises up at the SAME time (cross-fade)
+          if (window.letterFxOn) window.letterFxOn(); //    ✨ NEW: the pretty surroundings fade in too
+          setTimeout(startTyping, 800); // 3) typing starts once the paper has landed
+        }, 1000);
+      };
+      function startTyping() {
+        let i = 0;
+        (function type() {
+          if (i >= letterText.length) return finishTyping();
+          const ch = letterText[i++];
+          paper.textContent = letterText.slice(0, i);
+          paper.scrollTop = paper.scrollHeight; // keeps the newest line visible
+          // small natural pauses after punctuation and new lines
+          let d = CONFIG.typingSpeed;
+          if (".!?".includes(ch)) d *= 9;
+          else if (ch === ",") d *= 4;
+          else if (ch === "\n") d *= 6;
+          typeTimer = setTimeout(type, d);
+        })();
+      }
+      // (Tapping the paper does nothing on purpose, so the typing can't be skipped. She reads it as it's written 💌)
+
+      /* ---------- ✨ NEW: pretty surroundings + background music for the letter scene ---------- */
+      const fx = $("#letterFx");
+      const letterIdx = sc.indexOf($("#sLetter")); // which scene number the letter is
+
+      // Build floating hearts / petals / sparkles (26) and fireflies (16) once
+      (function buildFx() {
+        const bits = ["💖", "🌸", "✨", "💛", "🌷", "⭐", "🦋", "💫"]; // 🔧 you can swap these emojis
+        for (let i = 0; i < 26; i++) {
+          const f = document.createElement("span");
+          f.className = "fl";
+          f.textContent = bits[i % bits.length];
+          f.style.cssText =
+            `left:${Math.random() * 100}%;font-size:${0.9 + Math.random() * 1.1}rem;` +
+            `animation-duration:${9 + Math.random() * 9}s;animation-delay:${-Math.random() * 16}s;` +
+            `--dx:${(Math.random() - 0.5) * 140}px;--rot:${(Math.random() - 0.5) * 360}deg`;
+          fx.appendChild(f);
+        }
+        for (let i = 0; i < 16; i++) {
+          const f = document.createElement("i");
+          f.className = "ff";
+          f.style.cssText =
+            `left:${Math.random() * 100}%;top:${Math.random() * 100}%;` +
+            `animation-duration:${4 + Math.random() * 5}s;animation-delay:${-Math.random() * 6}s;` +
+            `--fx:${(Math.random() - 0.5) * 70}px;--fy:${(Math.random() - 0.5) * 70}px`;
+          fx.appendChild(f);
+        }
+      })();
+      window.letterFxOn = () => {
+        fx.classList.add("on");
+        $(".lstage").classList.add("fx");
+      };
+
+      // 🎵 Background music: fades in on the envelope tap, loops, has a small mute button
+      const bgm = $("#bgm"),
+        mbtn = $("#musicBtn");
+      let musicStarted = false,
+        fadeT = null;
+      if (CONFIG.music) bgm.src = CONFIG.music; // 🎵 the audio file name from CONFIG.music is used here
+      function fadeTo(target, ms, done) {
+        clearInterval(fadeT);
+        const from = bgm.volume,
+          t0 = Date.now();
+        fadeT = setInterval(() => {
+          const k = Math.min(1, (Date.now() - t0) / ms);
+          bgm.volume = Math.max(0, Math.min(1, from + (target - from) * k));
+          if (k >= 1) {
+            clearInterval(fadeT);
+            if (done) done();
+          }
+        }, 60);
+      }
+      window.musicPlay = () => {
+        if (!CONFIG.music || musicStarted) return;
+        musicStarted = true;
+        bgm.volume = 0;
+        bgm
+          .play()
+          .then(() => {
+            mbtn.classList.add("on");
+            fadeTo(CONFIG.musicVolume, 3000); // gentle 3-second fade-in
+          })
+          .catch(() => {});
+      };
+      bgm.onerror = () => mbtn.classList.remove("on"); // audio file missing → stay silent, hide the button
+      mbtn.onclick = () => {
+        // mute / unmute
+        if (bgm.paused) {
+          bgm.play().catch(() => {});
+          fadeTo(CONFIG.musicVolume, 600);
+          mbtn.textContent = "🔊";
+        } else {
+          fadeTo(0, 400, () => bgm.pause());
+          mbtn.textContent = "🔇";
+        }
+      };
+      window.onSceneChange = (i) => {
+        if (i !== letterIdx) fx.classList.remove("on"); // decorations fade away when she leaves the letter
+        if (i !== letterIdx && CONFIG.musicOnlyInLetter && musicStarted) {
+          mbtn.classList.remove("on"); // hide the mute button too, the song is done
+          if (!bgm.paused) fadeTo(0, 1800, () => bgm.pause());
+        }
+      };
+
+      /* ---------- Scene 4: wish → lantern floats away ---------- */
+      $("#release").onclick = () => {
+        const w = $("#wish").value.trim() || "a really good year ✨"; // if she writes nothing, a default wish is used
+        const l = document.createElement("div");
+        l.className = "lantern";
+        l.innerHTML = `<div class="body"></div><div class="base"></div>`;
+        l.querySelector(".body").textContent = w;
+        document.body.appendChild(l);
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => l.classList.add("go")),
+        ); // starts the float-up animation
+        $("#release").disabled = true;
+        $("#release").style.opacity = 0.5;
+        setTimeout(() => go(6), 3800); // after ~4 seconds → move to the question scene
+        setTimeout(() => l.remove(), 9500);
+      };
+
+      /* ---------- Scene 5: "Do you like me?" with the doggy dodgy No ---------- */
+      const noTexts = [
+        "No 🐶",
+        "Are you sure? 🥺",
+        "Really?? 😢",
+        "Think again! 🐕",
+        "Pls say yes 🥹",
+        "I'll cry... 😭",
+        "Woof?! 🐾",
+        "Don't do this 💔",
+        "Last chance 🐶",
+        "Okay but… YES? 💖",
+        "Sad doggo 🐕‍🦺",
+        "Bark bark!! 🦴",
+      ]; // 🔧 you can edit these funny texts
+      const qEm = ["🥺", "😢", "🐶", "😭", "🐕", "🥹", "💔", "🐾"]; // emoji above the question that changes each time
+      let nc = 0,
+        ys = 1; // nc = how many times No was dodged, ys = size of the Yes button
+      const no = $("#no"),
+        yes = $("#yes");
+      function dodge() {
+        nc++;
+        no.textContent = noTexts[nc % noTexts.length];
+        $("#qe").textContent = qEm[nc % qEm.length];
+        $("#sad").textContent = nc > 2 ? "The doggy is getting sadder… 🐾" : "";
+        ys = Math.min(ys + 0.06, 1.5);
+        yes.style.transform = `scale(${ys})`; // Yes grows a little each time (max 1.5x)
+        const r = no.getBoundingClientRect();
+        if (!no.classList.contains("fly")) {
+          // first dodge: move No to <body> so it can't get clipped/lost
+          no.classList.add("fly");
+          document.body.appendChild(no);
+          no.style.left = r.left + "px";
+          no.style.top = r.top + "px";
+          void no.offsetWidth;
+        }
+        const w = no.offsetWidth,
+          h = no.offsetHeight,
+          m = 16,
+          cl = (x, a, b) => Math.max(a, Math.min(b, x));
+        const hop = () =>
+          (Math.random() < 0.5 ? -1 : 1) * (70 + Math.random() * 90); // 🔧 hop distance: 70–160px. Bigger numbers = harder to catch
+        no.style.left = cl(r.left + hop(), m, innerWidth - w - m) + "px";
+        no.style.top = cl(r.top + hop(), m, innerHeight - h - m) + "px";
+        no.style.transition = "left .3s ease-out, top .3s ease-out";
+      }
+      no.addEventListener("mouseenter", () => {
+        if (nc % 2 === 0) dodge();
+      }); // laptop: runs away when the mouse comes near
+      no.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          dodge();
+        },
+        { passive: false },
+      ); // phone: runs away on touch
+      no.addEventListener("click", (e) => {
+        e.preventDefault();
+        dodge();
+      });
+      yes.onclick = () => {
+        $("#qe").textContent = "🥰";
+        no.style.display = "none";
+        setTimeout(() => go(7), 800);
+      }; // Yes → go to the gift scene
+
+      /* ---------- Scene 6 (part 1): the grand gift-box reveal ---------- */
+      // 14 sparkles that fly out of the box when it opens (each flies in a different direction)
+      const emo = ["✨", "⭐", "💖", "✨", "🌟", "💫", "✨"];
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2,
+          d = 110 + Math.random() * 90,
+          s = document.createElement("span");
+        s.textContent = emo[i % emo.length];
+        s.style.setProperty("--x", Math.cos(a) * d + "px");
+        s.style.setProperty("--y", Math.sin(a) * d - 40 + "px");
+        s.style.setProperty("--d", Math.random() * 0.25 + "s");
+        $("#sp").appendChild(s);
+      }
+      let giftOpened = false;
+      $("#gbox").onclick = () => {
+        if (giftOpened) return;
+        giftOpened = true;
+        const gb = $("#gbox");
+        $("#gsub").classList.add("off"); // hint fades out
+        gb.classList.add("wob"); // 1) the box wiggles
+        setTimeout(() => gb.classList.add("open"), 600); // 2) lid flies off, rays + sparkles burst out
+        setTimeout(() => {
+          // 3) box fades away, golden card rises up
+          gb.classList.add("done");
+          $("#gcard").classList.add("show");
+        }, 1900);
+      };
+      // After her UPI ID is sent: the card fades, "It's on its way!" pops up, then the final birthday page appears.
+      function celebrate() {
+        $("#gcard").classList.add("done");
+        setTimeout(() => $("#sent").classList.add("show"), 500);
+        setTimeout(() => go(8), 2800);
+      }
+
+      /* ---------- Scene 6 (part 2): UPI form → Formspree ---------- */
+      $("#giftForm").addEventListener("submit", async (e) => {
+        e.preventDefault(); // stops the page from reloading
+        const upi = $("#upi").value.trim();
+
+        // Check it looks like a UPI ID (something@bank). Spaces / missing @ are rejected.
+        if (!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)) {
+          $("#err").textContent =
+            "Please enter a valid UPI ID (like name@upi) 🥺";
+          return;
+        }
+        $("#err").textContent = "";
+
+        const btn = $("#send");
+        btn.disabled = true;
+        btn.textContent = "Sending… ✨";
+
+        // Formspree not set up yet? Let the page continue (so you can preview it) but warn in the console.
+        if (!CONFIG.formspreeId || CONFIG.formspreeId === "YOUR_FORM_ID") {
+          console.warn(
+            "⚠️ Formspree is not set up. Paste your form ID into CONFIG.formspreeId, otherwise you will NOT receive her UPI ID!",
+          );
+          celebrate();
+          return;
+        }
+
+        try {
+          // 📬 This is the Formspree request. It sends her UPI ID to https://formspree.io/f/<your id>
+          const res = await fetch(
+            "https://formspree.io/f/" + CONFIG.formspreeId,
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                upi: upi, // ← shows up as "upi" in your email
+                _subject: CONFIG.emailSubject, // ← the email subject (special Formspree field)
+                _gotcha: $("#giftForm [name=_gotcha]").value, // ← spam trap (stays empty for real people)
+              }),
+            },
+          );
+          if (res.ok) {
+            celebrate(); // ✅ sent → "It's on its way!" animation, then the final birthday page
+          } else {
+            throw new Error("Formspree error " + res.status);
+          }
+        } catch (err) {
+          console.error(err);
+          $("#err").textContent =
+            "Oops, couldn't send that. Check your internet and try again 🥺";
+          btn.disabled = false;
+          btn.textContent = "Send 💌";
+        }
+      });
+
+      /* ---------- Scene 7: replay ---------- */
+      $("#again").onclick = () => location.reload();
+    </script>
+  </body>
+</html>
